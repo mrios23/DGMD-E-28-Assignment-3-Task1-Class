@@ -1,3 +1,69 @@
+/******************* CLASS DECLARATIONS *******************/
+class Food {
+    #name; #price;
+    constructor(name, price) {
+        this.#name = name;
+        this.#price = price;
+    }
+
+    getName(){
+        return this.#name;
+    }
+
+    getPrice(){
+        return this.#price;
+    }
+}
+
+class Order {
+    #orderedItems; #total;
+    constructor() {
+        this.#orderedItems = [];
+        this.#total = 0;
+    }
+
+    addItemsToOrder(){
+        for(let i=0; i<menu.length; i++){
+            let menuItem = menu[i].getName();
+            let amount = parseFloat(document.getElementById(menuItem).value);
+    
+            if(!isNaN(amount)){
+                this.#orderedItems[menuItem] = amount;
+            }
+        }
+    }
+
+    calculateTotal(){
+        Object.keys(this.#orderedItems).forEach((item)=>{
+            // for each item in order - find the corresponding object from the menu
+            let menuItem;
+            for(let i=0; i<menu.length; i++){
+                if(menu[i].getName() == item){
+                    menuItem = menu[i];
+                }else{
+                    continue;
+                }
+            }
+
+            let amount = parseFloat(document.getElementById(menuItem.getName()).value);
+            if(!isNaN(amount)){
+                // calculate price & add to total
+                let price = menuItem.getPrice();
+                let subTotal = amount * price;
+                this.#total += subTotal;
+            }
+        });
+    }
+
+    getTotal(){
+        return this.#total;
+    }
+
+    getOrderedItems(){
+        return this.#orderedItems;
+    }
+}
+
 /******************** GLOBAL VARIABLES ********************/
 const placeOrderBtn = document.getElementById("begin-order-btn");
 const submitOrderBtn = document.getElementById("submit-order-btn");
@@ -5,26 +71,13 @@ const modifyOrderBtn = document.getElementById("modify-order-btn");
 const calculatedTotal = document.getElementById("calculated-amount");
 const finalOrder = document.getElementById("ordered-items");
 
-/* Constructor for food function object */
-function Food(name, price){
-    this.name = name;
-    this.price = price;
-}
-
-/* Constructor for order function object */
-function Order(){
-    this.orderItems = addItemsToOrder;
-    this.total = calculateTotal;
-}
-
 const hotdogs = new Food("hotdogs", 4);
 const fries = new Food("fries", 3.50);
 const soda = new Food("soda", 1.50);
 const sauerkraut = new Food("sauerkraut", 1);
 
 const menu = [hotdogs, fries, soda, sauerkraut];
-
-/***************** END OF GLOBAL VARIABLES *****************/
+/**************** END OF GLOBAL VARIABLES ****************/
 
 window.onload = () => {
     var orderedItems = [];    
@@ -41,8 +94,11 @@ window.onload = () => {
     submitOrderBtn.addEventListener("click", ()=>{
 
         var newOrder = new Order();
-        orderedItems = newOrder.orderItems();
-        total = newOrder.total(orderedItems);
+        newOrder.addItemsToOrder();
+        newOrder.calculateTotal();
+
+        orderedItems = newOrder.getOrderedItems();
+        total = newOrder.getTotal();
 
         displayReceipt(orderedItems, total);
     });
@@ -66,50 +122,6 @@ window.onload = () => {
 
 
 /********************* UTILITY METHODS *********************/
-/*  Function to calculate final order
-    Parameters: 
-        order - list of menu items that were ordered
-*/
-function calculateTotal(order){
-    let sum = 0;
-    for(item in order){
-        // for each item in order - find the corresponding object from the menu
-        let menuItem;
-        for(let i=0; i<menu.length; i++){
-            if(menu[i].name == item){
-                menuItem = menu[i];
-            }else{
-                continue;
-            }
-        }
-        
-        let amount = parseFloat(document.getElementById(menuItem.name).value);
-        if(!isNaN(amount)){
-            // calculate price & add to total
-            let price = menuItem.price;
-            let subTotal = amount * price;
-            sum += subTotal;
-        }
-    }
-    return sum;
-}
-
-/*  Function to retrieve items that were orderd & return order list
-    Parameters: none
-*/
-function addItemsToOrder(){
-    let orderList = [];
-    for(let i=0; i<menu.length; i++){
-        let menuItem = menu[i].name;
-        let amount = parseFloat(document.getElementById(menuItem).value);
-
-        if(!isNaN(amount)){
-            orderList[menuItem] = amount;
-        }
-    }
-    return orderList;
-}
-
 /*  Function to display receipt
     Parameters: 
         order - items that are ordered, 
